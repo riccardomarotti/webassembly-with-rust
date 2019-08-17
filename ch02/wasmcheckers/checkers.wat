@@ -132,4 +132,39 @@
             (i32.const 0)
         )
     )
+
+    ;; Should this piece get crowned?
+    ;; We crown black pieces in row 0, white pieces in row 7
+    (func $shouldCrown (param $pieceY i32) (param $piece i32) (result i32)
+        (i32.or
+            (i32.and
+                (i32.eq
+                    (get_local $pieceY)
+                    (i32.const 0)
+                )
+                (call $isBlack (get_local $piece))
+            )
+            (i32.and
+                (i32.eq
+                    (get_local $pieceY)
+                    (i32.const 7)
+                )
+                (call $isWhite (get_local $piece))
+            )
+        )
+    )
+
+    ;; Converts a piece into a crowned piece and invokes
+    ;; a host notifier
+    (func $crownPiece (param $x i32) (param $y i32)
+        (local $piece i32)
+        (set_local $piece (call $getPiece (get_local $x)(get_local $y)))
+        (call $setPiece (get_local $x) (get_local $y)
+            (call $withCrown (get_local $piece)))
+        (call $notify_piececrowned (get_local $x)(get_local $y))
+    )
+
+    (func $distance (param $x i32)(param $y i32)(result i32)
+        (i32.sub (get_local $x) (get_local $y))
+    )
 )
